@@ -6,7 +6,6 @@ import (
 	"go/parser"
 	"go/token"
 	"io/fs"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -103,7 +102,7 @@ func docStructs(dir string) (map[string]structType, error) {
 			switch t := n.(type) {
 			case *ast.TypeSpec:
 				structName = t.Name.String()
-				// log.Println(structName, "doc:", t)
+				// fmt.Println(structName, "doc:", t)
 				if t.Doc == nil {
 					structDoc = structDocs[structName]
 				} else {
@@ -142,13 +141,11 @@ func docStructs(dir string) (map[string]structType, error) {
 					case *ast.Ident:
 						fieldT.fType = tt.Name
 					case *ast.ArrayType:
-						// fmt.Printf("%v - %#v\n", tt.Elt, tt.Elt)
 						if selectorExpr, ok := tt.Elt.(*ast.SelectorExpr); ok {
 							fieldT.fType = "[]" + fmt.Sprintf("%v.%v", selectorExpr.X, selectorExpr.Sel)
 						} else {
 							fieldT.fType = "[]" + fmt.Sprint(tt.Elt)
 						}
-						// fieldT.fType = "[]" + fmt.Sprint(tt.Elt)
 					case *ast.MapType:
 						fieldT.fType = fmt.Sprintf("map[%v]%v", tt.Key, tt.Value)
 					case *ast.StarExpr:
@@ -160,29 +157,29 @@ func docStructs(dir string) (map[string]structType, error) {
 				}
 				structMap[structName] = st
 			case *ast.File:
-				// log.Println("file name", t.Name)
+				// fmt.Println("file name", t.Name)
 			case *ast.ImportSpec:
 			case *ast.BasicLit:
-				// log.Println("basiclit:", t.Kind)
+				// fmt.Println("basiclit:", t.Kind)
 			case *ast.ValueSpec:
-				// log.Println("valuespec:", t)
+				// fmt.Println("valuespec:", t)
 				if t.Doc != nil {
-					log.Println("ValueSpec doc:", t.Doc.Text())
+					fmt.Println("ValueSpec doc:", t.Doc.Text())
 				}
 			case *ast.StarExpr:
-				// log.Println("starexpr:", t)
+				// fmt.Println("starexpr:", t)
 			case *ast.CompositeLit:
-				// log.Println("compositelit:", t)
+				// fmt.Println("compositelit:", t)
 			case *ast.MapType:
-				// log.Println("maptype:", t)
+				// fmt.Println("maptype:", t)
 			case *ast.ArrayType:
-				// log.Println("arraytype:", t)
+				// fmt.Println("arraytype:", t)
 			case *ast.FieldList:
-				// log.Println("fieldlist:", t)
+				// fmt.Println("fieldlist:", t)
 			case *ast.Field:
-				// log.Println("field:", t)
+				// fmt.Println("field:", t)
 			case *ast.BlockStmt:
-				// log.Println("blockstmt:", t)
+				// fmt.Println("blockstmt:", t)
 			case *ast.GenDecl:
 				doc := t.Doc.Text()
 				if doc != "" {
@@ -272,23 +269,24 @@ func fieldsAsMarkdownTable(str *structType, builder *strings.Builder, named bool
 }
 
 func main() {
-	log.SetFlags(0)
-
 	if len(os.Args) != 2 {
-		log.Fatalf("usage: %s /path/to/gochan/", os.Args[0])
+		fmt.Printf("usage: %s /path/to/gochan/", os.Args[0])
+		os.Exit(1)
 	}
 
 	gochanRoot := os.Args[1]
 	cfgDir := path.Join(gochanRoot, "pkg/config")
 	configStructs, err := docStructs(cfgDir)
 	if err != nil {
-		log.Fatalf("Error parsing package in %s: %s", cfgDir, err)
+		fmt.Printf("Error parsing package in %s: %s", cfgDir, err)
+		os.Exit(1)
 	}
 
 	geoipDir := path.Join(gochanRoot, "pkg/posting/geoip")
 	geoipStructs, err := docStructs(geoipDir)
 	if err != nil {
-		log.Fatalf("Error parsing package in %s: %s", geoipDir, err)
+		fmt.Printf("Error parsing package in %s: %s", geoipDir, err)
+		os.Exit(1)
 	}
 
 	var builder strings.Builder
@@ -320,19 +318,19 @@ func main() {
 	country.name = "geoip.Country"
 	cfgColumnLengths.setLengths(country)
 	fieldsAsMarkdownTable(&country, &builder, true, true, &cfgColumnLengths)
-	log.Println(builder.String())
+	fmt.Println(builder.String())
 
-	tempFile := path.Join(os.TempDir(), "cfgdoc.md")
-	fi, err := os.OpenFile(tempFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
-	if err != nil {
-		log.Fatalf("Unable to open cfgdoc.md: %s", err)
-	}
-	defer fi.Close()
-	if _, err = fi.WriteString(builder.String()); err != nil {
-		log.Fatalf("Unable to write to cfgdoc.md: %s", err)
-	}
-	if err = fi.Close(); err != nil {
-		log.Fatalf("Unable to close cfgdoc.md: %s", err)
-	}
-	log.Println(tempFile)
+	// tempFile := path.Join(os.TempDir(), "cfgdoc.md")
+	// fi, err := os.OpenFile(tempFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	// if err != nil {
+	// 	fmt.Fatalf("Unable to open cfgdoc.md: %s", err)
+	// }
+	// defer fi.Close()
+	// if _, err = fi.WriteString(builder.String()); err != nil {
+	// 	fmt.Fatalf("Unable to write to cfgdoc.md: %s", err)
+	// }
+	// if err = fi.Close(); err != nil {
+	// 	fmt.Fatalf("Unable to close cfgdoc.md: %s", err)
+	// }
+	// fmt.Println(tempFile)
 }
