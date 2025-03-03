@@ -290,7 +290,9 @@ func main() {
 	}
 
 	var builder strings.Builder
-	builder.WriteString("# Configuration\nSee [gochan.example.json](examples/configs/gochan.example.json) for an example gochan.json.\n\n**Make sure gochan has read-write permission for `DocumentRoot` and `LogDir` and read permission for `TemplateDir`**")
+	builder.WriteString("# Configuration\n" +
+		"See [gochan.example.json](examples/configs/gochan.example.json) for an example gochan.json.\n\n" +
+		"**Make sure gochan has read-write permission for `DocumentRoot` and `LogDir` and read permission for `TemplateDir`**\n\n")
 
 	cfgColumnLengths := columnLengths{}
 	configStructsArray := make([]structType, 0, len(configStructs))
@@ -303,7 +305,26 @@ func main() {
 		str := configStructs[structName]
 		fieldsAsMarkdownTable(&str, &builder, false, s == 0, &cfgColumnLengths)
 	}
-	builder.WriteString("\n")
+	builder.WriteString("Example options for `GeoIPOptions`:\n")
+	builder.WriteString("```JSONC\n" +
+		"\"GeoIPType\": \"mmdb\",\n" +
+		"\"GeoIPOptions\": {\n" +
+		"\t\"dbLocation\": \"/usr/share/geoip/GeoIP2.mmdb\",\n" +
+		"\t\"isoCode\": \"en\" // optional\n" +
+		"}\n```\n\n" +
+		"CustomFlags` is an array with custom flags, selectable via dropdown. The `Flag` value is assumed to be in /static/flags/. Example:\n" +
+		"```JSON\n" +
+		"\"CustomFlags\": [\n" +
+		"\t{\"Flag\":\"california.png\", \"Name\": \"California\"},\n" +
+		"\t{\"Flag\":\"cia.png\", \"Name\": \"CIA\"},\n" +
+		"\t{\"Flag\":\"lgbtq.png\", \"Name\": \"LGBTQ\"},\n" +
+		"\t{\"Flag\":\"ms-dos.png\", \"Name\": \"MS-DOS\"},\n" +
+		"\t{\"Flag\":\"stallman.png\", \"Name\": \"Stallman\"},\n" +
+		"\t{\"Flag\":\"templeos.png\", \"Name\": \"TempleOS\"},\n" +
+		"\t{\"Flag\":\"tux.png\", \"Name\": \"Linux\"},\n" +
+		"\t{\"Flag\":\"windows9x.png\", \"Name\": \"Windows 9x\"}\n" +
+		"]\n```\n\n")
+
 	for _, structName := range explicitlyNamedStructTypes {
 		str := configStructs[structName]
 		if str.name == "" {
