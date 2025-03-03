@@ -290,7 +290,7 @@ func main() {
 	}
 
 	var builder strings.Builder
-	builder.WriteString("# Configuration\n\n")
+	builder.WriteString("# Configuration\nSee [gochan.example.json](examples/configs/gochan.example.json) for an example gochan.json.\n\n**Make sure gochan has read-write permission for `DocumentRoot` and `LogDir` and read permission for `TemplateDir`**")
 
 	cfgColumnLengths := columnLengths{}
 	configStructsArray := make([]structType, 0, len(configStructs))
