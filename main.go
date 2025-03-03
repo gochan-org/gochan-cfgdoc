@@ -305,14 +305,14 @@ func main() {
 		str := configStructs[structName]
 		fieldsAsMarkdownTable(&str, &builder, false, s == 0, &cfgColumnLengths)
 	}
-	builder.WriteString("Example options for `GeoIPOptions`:\n")
+	builder.WriteString("\nExample options for `GeoIPOptions`:\n")
 	builder.WriteString("```JSONC\n" +
 		"\"GeoIPType\": \"mmdb\",\n" +
 		"\"GeoIPOptions\": {\n" +
 		"\t\"dbLocation\": \"/usr/share/geoip/GeoIP2.mmdb\",\n" +
 		"\t\"isoCode\": \"en\" // optional\n" +
 		"}\n```\n\n" +
-		"CustomFlags` is an array with custom flags, selectable via dropdown. The `Flag` value is assumed to be in /static/flags/. Example:\n" +
+		"`CustomFlags` is an array with custom post flags, selectable via dropdown. The `Flag` value is assumed to be a file in /static/flags/. Example:\n" +
 		"```JSON\n" +
 		"\"CustomFlags\": [\n" +
 		"\t{\"Flag\":\"california.png\", \"Name\": \"California\"},\n" +
