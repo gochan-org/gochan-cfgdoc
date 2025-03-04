@@ -235,7 +235,9 @@ func fieldsAsMarkdownTable(str *structType, builder *strings.Builder, named bool
 			builder.WriteRune(' ')
 		}
 
-		builder.WriteString("|Board option ")
+		if !named {
+			builder.WriteString("|Board option ")
+		}
 
 		if lengths.defaultLength > 0 {
 			builder.WriteString("|Default")
@@ -281,10 +283,12 @@ func fieldsAsMarkdownTable(str *structType, builder *strings.Builder, named bool
 			builder.WriteRune(' ')
 		}
 
-		if str.isBoardConfig() {
-			builder.WriteString("|Yes          ")
-		} else {
-			builder.WriteString("|No           ")
+		if !named {
+			if str.isBoardConfig() {
+				builder.WriteString("|Yes          ")
+			} else {
+				builder.WriteString("|No           ")
+			}
 		}
 
 		builder.WriteRune('|')
