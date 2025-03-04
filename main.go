@@ -14,10 +14,10 @@ import (
 
 var (
 	compositeStructTypes = []string{
-		"SystemCriticalConfig", "SQLConfig", "SiteConfig", "CaptchaConfig", "BoardConfig", "PostConfig", "UploadConfig",
+		"SystemCriticalConfig", "SQLConfig", "SiteConfig", "BoardConfig", "PostConfig", "UploadConfig",
 	}
 	explicitlyNamedStructTypes = []string{
-		"PageBanner", "BoardCooldowns",
+		"CaptchaConfig", "PageBanner", "BoardCooldowns",
 	}
 )
 
