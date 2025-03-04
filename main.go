@@ -12,6 +12,17 @@ import (
 	"strings"
 )
 
+const (
+	configHeader = `# Configuration
+See [gochan.example.json](examples/configs/gochan.example.json) for an example gochan.json.
+
+**Make sure gochan has read-write permission for ` + "`" + `DocumentRoot` + "`" + ` and ` + "`" + `LogDir` + "`" + ` and read permission for ` + "`" + `TemplateDir` + "`" + `**
+
+Fields in the table marked as board options can be overridden on individual boards by adding them to  board.json, which gochan looks for in the board directory or in the same directory as gochan.json.
+
+`
+)
+
 var (
 	compositeStructTypes = []string{
 		"SystemCriticalConfig", "SQLConfig", "SiteConfig", "BoardConfig", "PostConfig", "UploadConfig",
@@ -71,6 +82,10 @@ type structType struct {
 	name   string
 	doc    string
 	fields []fieldType
+}
+
+func (s *structType) isBoardConfig() bool {
+	return s.name == "BoardConfig" || s.name == "PostConfig" || s.name == "UploadConfig"
 }
 
 type fieldType struct {
@@ -219,12 +234,16 @@ func fieldsAsMarkdownTable(str *structType, builder *strings.Builder, named bool
 		for range lengths.typeLength - 3 {
 			builder.WriteRune(' ')
 		}
+
+		builder.WriteString("|Board option ")
+
 		if lengths.defaultLength > 0 {
 			builder.WriteString("|Default")
 			for range lengths.defaultLength - 4 {
 				builder.WriteRune(' ')
 			}
 		}
+
 		builder.WriteString("|Info\n")
 		for range lengths.fieldLength + 1 {
 			builder.WriteRune('-')
@@ -232,6 +251,12 @@ func fieldsAsMarkdownTable(str *structType, builder *strings.Builder, named bool
 		builder.WriteRune('|')
 		for range lengths.typeLength + 1 {
 			builder.WriteRune('-')
+		}
+		if !named {
+			builder.WriteRune('|')
+			for range 13 {
+				builder.WriteRune('-')
+			}
 		}
 		if lengths.defaultLength > 0 {
 			builder.WriteRune('|')
@@ -255,6 +280,13 @@ func fieldsAsMarkdownTable(str *structType, builder *strings.Builder, named bool
 		for range lengths.typeLength - len(field.fType) + 1 {
 			builder.WriteRune(' ')
 		}
+
+		if str.isBoardConfig() {
+			builder.WriteString("|Yes          ")
+		} else {
+			builder.WriteString("|No           ")
+		}
+
 		builder.WriteRune('|')
 		if lengths.defaultLength > 0 {
 			builder.WriteString(field.defaultVal)
@@ -290,9 +322,7 @@ func main() {
 	}
 
 	var builder strings.Builder
-	builder.WriteString("# Configuration\n" +
-		"See [gochan.example.json](examples/configs/gochan.example.json) for an example gochan.json.\n\n" +
-		"**Make sure gochan has read-write permission for `DocumentRoot` and `LogDir` and read permission for `TemplateDir`**\n\n")
+	builder.WriteString(configHeader)
 
 	cfgColumnLengths := columnLengths{}
 	configStructsArray := make([]structType, 0, len(configStructs))
@@ -340,18 +370,4 @@ func main() {
 	cfgColumnLengths.setLengths(country)
 	fieldsAsMarkdownTable(&country, &builder, true, true, &cfgColumnLengths)
 	fmt.Println(builder.String())
-
-	// tempFile := path.Join(os.TempDir(), "cfgdoc.md")
-	// fi, err := os.OpenFile(tempFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
-	// if err != nil {
-	// 	fmt.Fatalf("Unable to open cfgdoc.md: %s", err)
-	// }
-	// defer fi.Close()
-	// if _, err = fi.WriteString(builder.String()); err != nil {
-	// 	fmt.Fatalf("Unable to write to cfgdoc.md: %s", err)
-	// }
-	// if err = fi.Close(); err != nil {
-	// 	fmt.Fatalf("Unable to close cfgdoc.md: %s", err)
-	// }
-	// fmt.Println(tempFile)
 }
