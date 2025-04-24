@@ -144,12 +144,13 @@ func docStructs(dir string) (map[string]structType, error) {
 						fieldT.doc = field.Doc.Text()
 					}
 					docLines := strings.Split(fieldT.doc, "\n")
-
+					fieldT.doc = ""
 					for _, line := range docLines {
 						if strings.HasPrefix(strings.ToLower(line), "default: ") && fieldT.defaultVal == "" {
 							fieldT.defaultVal = line[9:]
 							break
 						}
+						fieldT.doc += line + "\n"
 					}
 
 					switch tt := field.Type.(type) {
